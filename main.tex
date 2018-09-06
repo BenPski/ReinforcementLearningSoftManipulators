@@ -1,0 +1,271 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+                                                          % if you need a4paper
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
+                                                          % paper
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{verbatim}
+
+\title{\LARGE \bf
+Applying Reinforcement Learning for the Dynamic Control of Soft Robots
+}
+
+%\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
+%         \thanks{*Use the $\backslash$thanks command to put information here}\\
+%         Faculty of Electrical Engineering, Mathematics and Computer Science\\
+%         University of Twente\\
+%         7500 AE Enschede, The Netherlands\\
+%         {\tt\small h.kwakernaak@autsubmit.com}}
+%         \hspace*{ 0.5 in}
+%         \parbox{3 in}{ \centering Pradeep Misra**
+%         \thanks{**The footnote marks may be inserted manually}\\
+%        Department of Electrical Engineering \\
+%         Wright State University\\
+%         Dayton, OH 45435, USA\\
+%         {\tt\small pmisra@cs.wright.edu}}
+%}
+
+\author{Ben Pawlowski and Jianguo Zhao% <-this % stops a space
+\thanks{This work was supported by mon\'e}% <-this % stops a space
+\thanks{Ben Pawlowski and Jianguo Zhao are with Department of Mechanical Engineering, Colorado State University, Fort Collins, CO 80523, USA.  {\tt\small benpski@rams.colostate.edu,  Jianguo.Zhao@colostate.edu}}%
+}
+
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+
+Soft robotics have many potential avenues for applications; however, due to the complexity of their structure and behavior the capacity to control the robots is limited. Analytic solutions can be conceptualized to solve the controls, but they are too computationally intensive for real-time application. So, we use reinforcement learning to approach the problem of control. We test the effectiveness and efficiency of reinforcement learning techniques to the control of soft robots.
+
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{INTRODUCTION}
+
+Soft robotics is a young field motivated by the potential given to compliant mechanisms over traditional rigid robots. The compliance allows for the robots to better adapt to uncertainty in their environments, a wider range of motions and configurations, safer interactions with soft objects and tissues, and can provide platforms for biological studies. By being made of entirely soft materials these robots can better adapt to their environments as their bodies automatically deform and adjust to the objects they come in contact with, for example in a grasping task a soft hand will automatically adapt to the shape of the object being grasped when closing around it without the need for any sensors or complex mechanisms. Soft robots also have infinite degrees of freedom in the shapes they can take on, which allows for a much wider variety of geometries and poses the robots can create. In the context of human interaction, soft robots have an advantage of rigid robots in that being soft means there is a much lower chance of serious damage to the person, this has been part of the inspiration for soft robots used in personal settings and medical settings. Finally, many soft robots make use of some biological inspiration and many provide a decent replication of the behavior, this allows for simplified biological studies where the behavior of the robot can be studied and repeated far more easily than on an actual biological specimen. Soft robots, while certainly not going to replace rigid robots, has several interesting niches that are being and have yet to be explored.
+
+While soft robots have many advantages over rigid robots in some domains, their main difficulty is in the modeling of the behavior. The behavior of soft robots is quite complex because it is no longer described by rigid body mechanics, but continuum mechanics and the infinite degrees of freedom in the configuration raises many difficulties in the control of the robots. The complexity of the behavior generally has to be modelled by nonlinear theories that lack analytic solutions, which then leads to real-time control being hard to implement. The static behavior of soft robots has been well studied and several common approaches have been established, the dynamics has been more recently studied, but not to the same depth, and the problems in control are still being looked into.
+
+The control of soft robots is the area that appears to need the most work in making applications of soft robots practical. Currently, for static control schemes a decent amount of work has been done on getting accurate control. In a common modeling framework for the behavior of soft robots, the constant curvature (CC) approximation, there are analytic solutions for the inverse kinematics and statics similar to techniques in traditional robots (e.g., DH-parameters). However, the CC approximation can't deal well external loads or dynamics. There are more general approaches as well that have been successful in static control that use many CC segments or more general models. There has also been successful approaches to control where things like the tip jacobian and stiffness are approximated in real-time. In the case of dynamic behavior for soft robots, the control has been much less developed. The dynamics have the downside of being much more computationally intensive and therefore harder to deal with in real-time. There has been work where the dynamics are learned by a recurrent neural network and then used for trajectory optimization, model-based approaches, and approaches that try to take advantage of embodied intelligence where the dynamic behavior is taken advantage of to perform tasks. There is still a lot of room to explore in the dynamic control of soft robots. 
+
+Due to the complexity of the soft robots behavior, the computationally costs, and uncertainty in modeling parameters machine learning has been applied to alleviate these issues. Machine learning techniques allow for nonlinear behavior to be learned and computed efficiently as long as a sufficient amount of data can be collected. Machine learning has been successfully applied to learning behaviors directly from simulations and then applied to physical prototypes and directly learning from the physical implementations. These were able to solve problems in modeling the behavior of the soft robots, the static control of soft robots, and dealing with uncertainties or phenomena not modelled in simulations. These techniques have been able to deal with some of the more difficult problems facing soft robots and only have the cost of generating samples to train on. However, there has not been much work on the application of machine learning to directly learning the dynamic control of soft robots.
+
+In machine learning there is a specific approach to dealing with control problems, reinforcement learning. Reinforcement learning aims to learn the optimal control policy on a specific task. Reinforcement learning works by observing interactions with an environment by seeing how actions change the state of the environment and a measured reward for how close the state is to achieving the task. The basic algorithm for reinforcement learning goes as: observe the state of the environment, take what is thought to be the optimal action based off the value of the possible actions, make a new observation and measure the reward for the task, update the predicted value based on the observations, and repeat. Lots of developments for applications and improvements to learning algorithms have been worked on in recent years and we believe that there is potential that reinforcement learning techniques can greatly supplement the study of soft robots.
+
+When applying reinforcement learning to the domain of soft robots there are several difficulties that show up. One such issue is that most reinforcement learning algorithms assume the dynamics can be modelled as a Markov Decision Process (MDP), or that the full state of the dynamics can be measured at every time step, which due to the infinite degrees of freedom in the configuration is not possible with a soft robot. In reinforcement learning the policy is to optimize the value over all the actions, but soft robots have continuous action spaces making the optimization of the value impractical, recent work has been done to address problems like this. Another complexity issue is that soft robots generally have many possible tasks they can perform while in reinforcement learning tends to assume a single task, some very recent work has looked at specifically dealing with task varying systems. There is also the fact that robots generally want to perform certain trajectories which is not a commonly looked at type of task. There are other possible issues to address in the application of reinforcement learning for soft robots, but these are the ones we aim to study.
+
+In this paper, we aim to apply reinforcement learning techniques to dynamic control of soft robots. We do so by starting with simple reaching tasks and increase the complexity of the tasks and observe the performance. We study the reinforcement learning when being used on simulations of the dynamic behavior of soft robots and test it on different actuation strategies for the soft robots. The paper proceeds by first overviewing the field of soft robots, their modeling and control, then discusses the theory behind reinforcement learning and the implementations, the experiments performed and results are presented, and then we discuss the findings and performance of the reinforcement learning applied to soft robots.
+
+
+\begin{comment}
+Motivation for soft robot applications (adaptable, uncertainty, safer, biological study)
+
+complexities due to being continuous and deformable (infinite degrees of freedom, lack of analytic solution, wide range of motions)
+
+lack of real-time control (dynamics computationally intensive, accuracy issues)
+
+uses of machine learning in soft robots (applied to inverse kinematics, learning dynamics and trajectory optimization, disturbance rejection, short time-horizon learning?)
+
+applications of machine learning to control problems (reinforcement learning for tasks)
+
+difficulties of reinforcement learning (non-markov, continuous action space, continuous goal space, various possible goals, sample efficiency?)
+
+what we are doing (applications of reinforcement learning to dynamic control trained on simulations)
+\end{comment}
+
+\section{Soft Robots}
+
+The field of soft robots is primarily motivated by the potential applications of a having a compliant structure interact with the environment. For traditional robots the ability to work with the environment is quite powerful; however, in cases where a robot is working in close proximity to humans, the environment is uncertain, or some other third thing being inherently compliant is a major benefit. Being compliant allows the robots to work in situations involving soft tissues with much less risk of damage. Also, the compliance allows for the robot to be readily adaptable to changes in the environment, for example if the task is to grab an object the shape and orientation is much easier to adapt to as the body will form to the grasped objects shape or if an object contacts the body the manipulator can adapt to the contact without damage. These types of robots also tend to carry a lot of biological inspiration in the form of things like octopus arms and elephant trunks.
+
+The main drawback to using soft robots in applications is the difficult in modeling the behavior. Due to the robots being deformable the shape of the robots has infinite degrees of freedom and generally analytic solutions to describe the behavior do not exist and can be computationally expensive to compute. This complexity of the behavior also makes the task of controlling the robots quite difficult. 
+
+Soft robot conceptualization
+
+Continuum mechanics, biological inspiration, typical design approaches
+
+\subsection{Modeling}
+
+A typical form for soft robots are as slender manipulators resembling the shape of octopus tentacles, which we will be focusing on in this paper. For these types of manipulators it is common to use an approach referred to as the constant curvature (CC) approximation where the body is assumed to undergo a pure bending deformation that can be described with a single curvature value. This greatly simplifies the model and configuration representation of the robot; however, lacks the capacity to model external forces and has to be use a lumped-parameter approximation to model the dynamics. There are extensions where the body is modelled as a series of CC segments increasing the configuration space, but increasing the accuracy as well. Another approach is to use a Cosserat rod model to describe the behavior, which we will be making use of in our simulations. The Cosserat rod model is a nonlinear theory that is capable of modeling extension, shearing, bending, and torsion in the soft manipulators and can more accurately model the behavior. The drawback is that there are generally no analytic solutions and have to be numerically computed, which can make real-time computations quite difficult to perform.
+
+The idea behind a Cosserat model is to take the fundamental element of the body as a infinitesimal rigid body rather than a particle. So, in the case of a rod the infinitesimal rigid body is represented as a rigid plane and therefore the body is a stack of rigid planes. The configurations of the planes are described by a position and rotation and the strains along the body are defined by the relative motion between the planes. An exposition can be found in \cite{CDC}. 
+
+For the experiments we are performing we will be looking at manipulators actuated by cables (a common actuation strategy) and Twisted-and-Coiled actuators (TCAs) \cite{tcaScience}. The cable driven manipulators tend to have much faster dynamics and more chaotic responses especially when actuated in air while the TCAs exhibit a much more damped response due to being thermally driven. By looking at both we get a decent look at the different kinds of behavior the soft manipulators can show.
+
+
+\subsection{Control Schemes}
+
+The methods of control for soft robots still has a lot of room to grow and experiment in, a good review of developed control schemes can be found in \cite{george2018control}. When looking at control we can split the approaches into static and dynamic. The static formulations are far more developed and explored due to their simplicity and having more accurate approximations to the behavior. For statics it is common to model the manipulators via a CC model or use piecewise constant curvature (PCC) models. These models greatly reduce the configuration space and simplify the representation in a way that allows for simple inversion of the problem and control. There have also been other approaches using machine learning techniques and approximated kinematics.
+
+For the dynamics the control is far more limited, mostly owing to the complexity of the modeling problem. In order to use model based approaches the accuracy needs to be high in order to be useful as the uncertainties can get amplified greatly due to the dynamics. Then, the challenge of using the model to control the manipulator is difficult due to the inherent nonlinearity of the dynamics; however, the difficult depends on the modeling approach used. There has been a limited number of model-free approaches to the control, this is mostly due to how difficult it is to accurately measure the configuration of the manipulator. The configuration has infinite degrees of freedom, but it is necessary to have a finite representation and the sensing cannot impede the dynamics too much. There has also been some research into embodied intelligence where the dynamics of the body can be taken advantage of in a control process, this has quite a few interesting avenues of research.
+
+In this paper, we look at applying reinforcement learning to the dynamics of soft manipulators in order to investigate what are the limitations and possibilities afforded by this approach to control.
+
+\section{Reinforcement Learning}
+
+The motivation behind reinforcement learning is that for many problems in control we can state the objective and determine a measure of success, but determining the optimal policy to achieve the objective is difficult or computationally expensive. Reinforcement learning then aims to learn the optimal policy through many interactions with the environment so that the value of the available actions may be learned and the policy is then simply following the actions that maximize the value at every step.
+
+Reinforcement learning starts by saying we may determine the value of a state under a certain policy by computing the accumulated reward when following that policy.
+
+\begin{gather}
+    \pi(s_t) = a_t \\
+    T(s_t,a_t) = s_{t+1} \\
+    V^{\pi}(s_t) = \sum_{i=t} \gamma^{t-i}R(s_i,\pi(s_i))
+\end{gather}
+where $\pi$ is the policy being followed, $T$ is the transition from one state to the next via an action (the dynamics of the problem), $R$ is the reward, $V$ is the value of the current state, and $\gamma$ is a discount factor allowing for the value to be finite when the time horizon is infinite.
+
+The value function can be restated in a more common form as:
+\begin{equation}
+    V^{\pi}(s) = R(s,a) + \gamma V^{\pi}(s'), s' = T(s,a)
+\end{equation}
+
+The optimal policy is then the policy that maximizes the value function, which is the function that we want to learn. 
+
+\begin{equation}
+    V^{*}(s) = \max_a R(s,a) + \gamma V^{*}(s')
+\end{equation}
+
+\subsection{Q-Learning and DDPG}
+
+For a reinforcement learning problem we need to determine an accurate approximation of the value function in order to determine the optimal policy. Then, if we have an accurate representation of the value then the optimal policy is simple, pick the action that gives the maximum value. For this it is common to restate the value to have a more explicit dependence on the action, referred to as the Q-function.
+
+\begin{equation}
+    Q^{\pi}(s,a) = R(s,a) + \gamma Q^{\pi}(s',a')
+\end{equation}
+
+This makes the optimal policy $\pi(s) = \max_a Q(s,a)$. Which, in the case of discrete actions is a simple computation to perform. 
+
+So, now the problem is how to get an accurate representation of Q. There have been many approaches to this problem, but the main concept behind most of the Q-learning algorithms is to collect many samples of the rewards, the states, the actions, and the following states and actions (commonly written as a tuple $(s,a,r,s',a')$). Then, using those samples to minimize the temporal difference error (TD-error).
+
+\begin{equation}
+    TD error = (r+Q(s',a') - Q(s,a))^2
+\end{equation}
+
+This is then an effective strategy for learning the optimal policy indirectly through the Q-function.
+
+However, what do we do when the actions are not discrete? We could still do the same process for learning the Q-function, but the optimization step for determining the policy is now computationally expensive especially when Q is approximated with a neural network due to the nonlinearity. So, when using Q-learning with a continuous action space we need a modification to avoid the optimization step.
+
+One popular approach is the Deep Deterministic Policy Gradient (DDPG) algorithm. The main idea here is to approximate both the Q-function and the policy as neural networks. Then, the Q network is trained as usual by minimizing the TD-error and the policy network is trained on maximizing $Q(s,a)$ (or minimizing $-Q(s,a)$). So, the policy and the Q networks become interleaved by the maximization of the Q network in the policy training. There are some other subtleties to the algorithm that are necessary for the algorithm to perform optimally such as a replay buffer and target networks, that are discussed elsewhere. 
+
+There have been other approaches to reinforcement learning with continuous action spaces, but we use DDPG as our base algorithm as it appears to be a common baseline for other algorithms to be compared against, has many available open-source implementations, and is established as being an effective algorithm in several domains.
+
+\subsection{Applying Reinforcement to Soft Robots}
+
+For soft robots there are some complications for applying reinforcement learning as they deviate from more commonly applied problems in a few areas. In reinforcement learning the dynamics process is assumed to be a Markov decision process (MDP) which assumes the full state of the dynamics can be represented at every step. However, due to the continuous nature of a soft robots state the full state can't be represented in a finite amount of data and the full state can't be reasonably measured in an application anyways. There is also the trouble of having a continuous action space, which has been addressed recently with algorithms like DDPG that we mentioned prior. Then, there are multiple different tasks a robot would want to perform, but for many reinforcement learning there is only a single task to perform. 
+
+To address the issue of soft robots not being representable as a MDP we can try several representations of the state space. Generally we can measure the position and velocities of different points along the body of a soft manipulator, while other state variables (e.g., strain) are difficult to measure. Then, in an application we want to have the minimal number of sensory inputs possible for the application. So, what we can do to determine the necessary state space for the learning to occur is to measure the position and velocity at one point and run the learning, if the performance is not very good we can increase the number of points we sample at. We begin by using the tip as the initial point and then we include the tip and the middle of the body to compare the performance. We do see that it is sufficient to only have the tip measurements in some applications and need more states in others.
+
+For continuous action spaces there has been some work already at addressing this and we make use of a common approach to dealing with this, the DDPG algorithm mentioned before. However, there is still the issue of having a continuous goal space. A common way of dealing with this is to simply concatenate the goal and the state space. We take this approach for our experiments, but we would like to point out some very recent work on approaching these types of problems in a more effective and sample efficient way. The two algorithms that stand out as relevant to the problem we are addressing are TDM and HER. Both aim to increase the sample efficiency on problems were the goal is variable and they report better performance than our approach of DDPG with a concatenation of the goal and state space. However, in our testing we did not find this to be true. This may be due to improper tuning of the hyperparameters that led to the poor performance, which appears to be a common issue amongst most reinforcement learning algorithms.
+
+One other problem we want to address that seems like it has yet to be looked at in the reinforcement learning field, which is variable trajectories. For many problems addressed in robotics the target is either a single static point or potentially many points in the workspace. However, it is possible to have tasks where the manipulator has to follow a particular trajectory with a given position and velocity, which does not appear to be addressed as far as we are aware. The issue here is that this could be considered a fairly complex task and that there are several ways of specifying a trajectory in practice and as a task to learn in reinforcement learning. The differences between these will be addressed more completely later.
+
+\section{Applications of Reinforcement Learning to Soft Manipulators}
+
+To see the effectiveness of reinforcement learning when applied to soft manipulators we run experiments on two different types of manipulators (cable driven and TCA driven) with an increasing difficult of the tasks. We also vary the state space to see what an effective set of measurements are. 
+
+For each experiment we establish the task, a measure of the reward, a way to generate the task, and a test problem to evaluate the performance. We need to change the reward between tasks because they are different problems, some reward "shapes" (e.g., sparse or continuous) are better for some tasks, and some tasks have terminal states while others do not. Then, when the tasks have a variable target we need a way of generating the targets in a reasonable way. Having a test problem then provides a consistent way of measuring the performance of the learned policy.
+
+Before beginning any of the tasks it is necessary to establish the workspaces for the manipulators so that reasonable targets and tasks can be generated. We use a convex hull to represent the static workspace and the dynamic workspace because there is not an analytic way of determining the workspace. One issue with the convex hull is that the workspace could possibly be concave, for example the static workspace forms a bit of a thick umbrella shape so it is concave on the bottom, but the concave portions appear relatively flat so the convex hull seems to be a reasonable approximation. For the static workspace the simulations are simply run to steady state over a grid of actions. For the dynamic workspace we could either just assume it is a workspace slightly larger than the statics or allow the simulations to run over a series of random actions and use that to create the workspace, we choose the latter.
+
+\subsection{Single Segment, Single Target}
+
+The first task we address is reaching to a specific point. This is posed as a dynamic reaching problem where the manipulator is trained to reach a single point just outside its static workspace. 
+
+The target point is selected as a small perturbation to one of the vertices of the convex hull that is outside the workspace. The reward function is the negative of the distance scaled so that the reward has a magnitude of roughly 1. In this problem it makes sense to say that if the tip is within a few millimeters (2mm in the experiments) it is deemed a terminal state. The evaluation problem is then whether or not the target is reached from the initial reference configuration in a few time steps.
+
+\subsection{Single Segment, Variable Target}
+
+This task is a step up in complexity from the previous one, it is a reaching problem, but for an arbitrary point in the dynamic workspace. The main difference between the previous task and this task is that the target can come from any point from within the dynamic workspace and so includes static points as well. The reward and terminal states measure are the same as before. The evaluation function changes to be several points within the workspace, which are 4 points in the cardinal directions near the boundary of the dynamic workspace. 
+
+We see in this experiment that increasing the state space is a necessary addition.
+
+\subsection{Single Segment, Variable Trajectory}
+
+For tracking a trajectory there are several choices for how to train the robot. Could simply reuse the training for the variable dynamic reaching; however, it is limited to being useful only on slow tracking tasks as the velocity is ignored. To incorporate some sort of motion there are several options, train on position and velocity or a sequence of positions. For the position and velocity training we can either select a random point in position and velocity space and allow the robot to train on that or a trajectory that varies through the training can be selected. Which to select is not obvious and all can be tried. There is also the question of whether or not the training can initially be done on dynamic reaching and then extended to trajectories to improve sample efficiency or not.
+
+In testing the variable trajectory where a trajectory is generated to be followed by specifying the position and velocity at every step we specify the start and end position as well as the start and end velocity and then fit a polynomial to these values. Thus the position is represented by a 4th-order polynomial. We also need the time horizon for this, which we simply specify as the duration of an episode. To select the positions we use the static workspace, so that when we select the velocity there is less chance that is exits the dynamic workspace, the velocities are randomly selected with small magnitudes in arbitrary directions. To measure the reward we again use the negative of the distance between the tip position and the current trajectory position, but we no longer have terminal states as we want the full trajectory to be tracked.
+
+\subsection{Multi-Segment, Cluttered Environment}
+
+\subsection{Multi-Segment, Poses}
+
+\section{Discussion}
+
+Performance on the various targets, 
+
+\section{What Worked and What Did not}
+
+We needed to incorporate more than just the tip kinematics, usually the mid point kinematics is good enough to improve the learning. 
+
+Trying TDM and HER were not effective in our tests, could have been an issue with tuning the hyperparameters. 
+
+Pretraining with dynamics did not help the learning convergence.
+
+ddpg with the goals concatenated with the state space seemed to be sufficient for most learning tasks
+
+\section{Conclusions}
+
+reinforcement learning is a possible approach to solving the issue of control. More work can be done investigating how to get the best sample efficiency for the training data and what are good states to measure to quantify the state accurately enough for applications in learning and requires minimal sensing.
+
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{APPENDIX}
+
+probably don't need appendices
+
+\section*{ACKNOWLEDGMENT}
+
+acknowledge if necessary.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,citations}
+
+
+
+\end{document}
